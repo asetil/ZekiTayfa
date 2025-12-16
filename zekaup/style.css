@@ -1155,3 +1155,61 @@ h2 {
         padding: 15px;
     }
 }
+
+/* XOX / Tic Tac Toe Styles */
+.xox-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 350px;
+    aspect-ratio: 1;
+    /* Keeps it perfectly square */
+    margin: 0 auto;
+    background: #2C3E50;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.xox-cell {
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-main);
+    font-size: 3rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.xox-cell:hover {
+    background: #f0f0f0;
+}
+
+.xox-cell.X {
+    color: var(--primary-color);
+}
+
+.xox-cell.O {
+    color: var(--secondary-color);
+}
+
+@keyframes winPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.win-anim {
+    animation: winPulse 0.5s ease;
+}

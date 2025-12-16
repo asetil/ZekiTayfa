@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "ZekiTayfa Başlat (Localhost)",
+            "url": "http://localhost:8080/zekaup/index.html",
+            "webRoot": "${workspaceFolder}",
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1
+            }
+        }
+    ]
+}

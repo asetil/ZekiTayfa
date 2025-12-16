@@ -20,6 +20,9 @@
                 <span id="header-name">Kullanıcı</span>
             </div>
             <div class="header-right">
+                <button id="header-bonus-btn" class="header-btn"
+                    style="background: linear-gradient(45deg, #FFD700, #FF8C00); color: black; font-weight: bold;">🎁
+                    Bonus</button>
                 <span class="badge level-badge" id="header-level">Seviye 1</span>
                 <button id="nav-levels-btn" class="header-btn" title="Seviyeler">☰ Seviyeler</button>
                 <button id="nav-switch-btn" class="header-btn secondary" title="Çıkış Olayı">↩</button>
@@ -86,8 +89,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- XOX Bonus Modal -->
+        <div id="xox-modal" class="modal hidden">
+            <div class="modal-content bounce-in" style="max-width: 400px;">
+                <h2>Bonus XOX 🎮</h2>
+                <p id="xox-status" style="font-size: 1.2rem; margin-bottom: 20px; font-weight: bold;">Sıra Sende (X)</p>
+                <div id="xox-board" class="xox-board">
+                    <!-- 9 Cells -->
+                </div>
+                <div class="modal-buttons">
+                    <button id="xox-close-btn" class="modal-btn secondary">Kapat</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>
