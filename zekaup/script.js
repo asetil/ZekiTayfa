@@ -101,6 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: "SOĞAN", src: "https://static7.depositphotos.com/1020804/753/i/450/depositphotos_7535602-stock-photo-onion-on-a-white-background.jpg" },
             { name: "BİBER", src: "https://vedigida.com/wp-content/uploads/2022/07/yesil-biber-500-gr-sebze-985-30-B.jpg" },
             { name: "BALKABAĞI", src: "https://png.pngtree.com/png-vector/20250221/ourmid/pngtree-happy-thanksgiving-day-pumpkin-icon-3d-rendering-png-image_15548670.png" }
+        ],
+        vehicles: [
+            { name: "ARABA", src: "https://img.icons8.com/fluency/200/car.png" },
+            { name: "OTOBÜS", src: "https://img.icons8.com/fluency/200/bus.png" },
+            { name: "UÇAK", src: "https://img.icons8.com/fluency/200/airplane-take-off.png" },
+            { name: "GEMİ", src: "https://img.icons8.com/fluency/200/ship.png" },
+            { name: "KAMYON", src: "https://img.icons8.com/fluency/200/truck.png" },
+            { name: "TREN", src: "https://img.icons8.com/fluency/200/train.png" },
+            { name: "BİSİKLET", src: "https://img.icons8.com/fluency/200/bicycle.png" },
+            { name: "HELİKOPTER", src: "https://img.icons8.com/fluency/200/helicopter.png" }
         ]
     };
 
@@ -385,11 +395,19 @@ document.addEventListener('DOMContentLoaded', () => {
         'memory',
         'odd',
         'assoc',
-        'counting',
+        'count',
         'sequence',
         'pattern',
         'quiz',
-        'cipher'
+        'cipher',
+        'shadow',
+        'sorting',
+        'matrix',
+        'mirror',
+        'puzzle',
+        'coding',
+        'rotation',
+        'cube'
     ];
 
     let minigameBag = [];
@@ -414,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
             refillBag();
         }
 
-        const gameCount = level <= 8 ? 1 : 2;
+        const gameCount = level <= 16 ? 1 : 2;
 
         minigameQueue = drawGames(gameCount);
 
@@ -441,7 +459,14 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (gameType === 'pattern') setupPatternGame(currentLevel);
         else if (gameType === 'quiz') setupAssociationQuiz(currentLevel); // Association quiz
         else if (gameType === 'cipher') setupCipherGame(currentLevel); // Letter-number cipher
-
+        else if (gameType === 'shadow') setupShadowGame(currentLevel);
+        else if (gameType === 'sorting') setupSortingGame(currentLevel);
+        else if (gameType === 'matrix') setupMatrixGame(currentLevel); // Matrix
+        else if (gameType === 'mirror') setupMirrorGame(currentLevel); // Mirror
+        else if (gameType === 'puzzle') setupPuzzleGame(currentLevel); // Part-Whole
+        else if (gameType === 'coding') setupCodingGame(currentLevel); // Algorithm
+        else if (gameType === 'rotation') setupRotationGame(currentLevel); // Mental Rotation
+        else if (gameType === 'cube') setupCubeGame(currentLevel); // Cube Counting
         showScreen(gameScreen);
     }
 
@@ -1360,6 +1385,1105 @@ document.addEventListener('DOMContentLoaded', () => {
                 canFlip = true;
             }, 1000);
         }
+    }
+
+    // --- Game Logic: Shadow Matching ---
+
+    function setupShadowGame(level) {
+        gameTitle.textContent = "Gölge Eşleştirme";
+        gameInstruction.textContent = "Resmin gölgesini bul!";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Pick a random category and item
+        const theme = getRandomTheme();
+        const targetItem = theme[Math.floor(Math.random() * theme.length)];
+
+        // Create Container
+        const container = document.createElement('div');
+        container.className = 'shadow-container';
+
+        // Target Image (Real Color)
+        const targetDiv = document.createElement('div');
+        targetDiv.className = 'shadow-target';
+        const targetImg = document.createElement('img');
+        targetImg.src = targetItem.src;
+        targetDiv.appendChild(targetImg);
+        container.appendChild(targetDiv);
+
+        // Options (Shadows)
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'shadow-options';
+
+        // Generate Distractors (Different items)
+        let options = [targetItem];
+        let attempts = 0;
+
+        // Difficulty: Number of options
+        let numOptions = 3;
+        if (level >= 5) numOptions = 4;
+
+        // Flatten all items for distractors
+        const allItems = [];
+        Object.values(THEMES).forEach(t => allItems.push(...t));
+
+        while (options.length < numOptions && attempts < 100) {
+            attempts++;
+            const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
+            // Ensure unique items (by name)
+            if (!options.some(o => o.name === randomItem.name)) {
+                options.push(randomItem);
+            }
+        }
+
+        options.sort(() => 0.5 - Math.random());
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'shadow-btn';
+
+            const icon = document.createElement('img');
+            icon.src = opt.src;
+            icon.className = 'shadow-icon'; // CSS makes it black
+            btn.appendChild(icon);
+
+            btn.addEventListener('click', () => {
+                if (opt.name === targetItem.name) {
+                    // Correct!
+                    SoundManager.playMatch();
+                    btn.classList.add('revealed'); // Show color
+                    btn.style.background = '#d4edda';
+                    btn.style.transform = 'scale(1.1)';
+                    addScore(true, btn);
+                    setTimeout(advanceQueue, 1000);
+                } else {
+                    // Wrong
+                    SoundManager.playError();
+                    btn.style.animation = 'shake 0.4s';
+                    btn.style.background = '#f8d7da';
+                    addScore(false, btn);
+                    setTimeout(() => {
+                        btn.style.animation = '';
+                        btn.style.background = 'rgba(255,255,255,0.5)';
+                    }, 400);
+                }
+            });
+
+            optionsDiv.appendChild(btn);
+        });
+
+        container.appendChild(optionsDiv);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Size Sorting ---
+
+    function setupSortingGame(level) {
+        gameTitle.textContent = "Boyut Sıralama";
+        gameInstruction.textContent = "Nesneleri KÜÇÜKTEN BÜYÜĞE doğru kutulara yerleştir!";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Pick a random item
+        const theme = getRandomTheme();
+        const item = theme[Math.floor(Math.random() * theme.length)];
+
+        const container = document.createElement('div');
+        container.className = 'sorting-container';
+
+        // Slots (Buckets)
+        const slotsContainer = document.createElement('div');
+        slotsContainer.className = 'sorting-slots-container';
+
+        // Define sizes logic
+        const sizes = ['small', 'medium', 'large', 'xlarge'];
+        const sizeLabels = ['Küçük', 'Orta', 'Büyük', 'En Büyük'];
+
+        sizes.forEach((size, index) => {
+            const slot = document.createElement('div');
+            slot.className = `sorting-slot slot-${size}`;
+            slot.dataset.size = size;
+            // Slot visual hint (optional label or icon)
+            // slot.textContent = sizeLabels[index]; 
+            // Better: Empty until filled
+
+            // Allow dropping or clicking? Let's use click-to-fill sequence for simplicity
+            // or: Click item, it flies to correct slot if it's the *next* expected size?
+            // Easiest for kids: "Find the smallest one!" -> Click -> Flies to small slot.
+            // "Find the medium one!" -> etc.
+
+            slotsContainer.appendChild(slot);
+        });
+
+        container.appendChild(slotsContainer);
+
+        // Pool of items
+        const poolDiv = document.createElement('div');
+        poolDiv.className = 'sorting-pool';
+
+        let itemsToClick = sizes.map(s => ({ size: s, item: item }));
+        itemsToClick.sort(() => 0.5 - Math.random()); // Shuffle
+
+        let currentExpectedIndex = 0; // 0=small, 1=medium, 2=large
+
+        itemsToClick.forEach(obj => {
+            const btn = document.createElement('button');
+            btn.className = 'sort-item-btn';
+
+            // Size scaling for the button content
+            let scale = 1;
+            if (obj.size === 'small') scale = 0.6;
+            if (obj.size === 'medium') scale = 0.8;
+            if (obj.size === 'large') scale = 1.0;
+
+            btn.style.width = '100px';
+            btn.style.height = '100px';
+
+            const img = document.createElement('img');
+            img.src = obj.item.src;
+            img.className = 'sort-item-img';
+            img.style.transform = `scale(${scale})`; // Visual size difference
+
+            btn.appendChild(img);
+
+            btn.addEventListener('click', () => {
+                const expectedSize = sizes[currentExpectedIndex];
+
+                if (obj.size === expectedSize) {
+                    // Correct!
+                    SoundManager.playMatch();
+
+                    // Visual Move:
+                    // 1. Mark button selected/hidden
+                    btn.classList.add('selected');
+
+                    // 2. Fill slot
+                    const slot = slotsContainer.children[currentExpectedIndex];
+                    slot.classList.add('filled');
+                    slot.innerHTML = '';
+                    const filledImg = document.createElement('img');
+                    filledImg.src = obj.item.src;
+                    filledImg.style.width = '80%';
+                    filledImg.style.height = '80%';
+                    filledImg.style.objectFit = 'contain';
+                    slot.appendChild(filledImg);
+
+                    addScore(true, slot);
+
+                    // Next
+                    currentExpectedIndex++;
+                    if (currentExpectedIndex >= sizes.length) {
+                        setTimeout(advanceQueue, 1000);
+                    }
+                } else {
+                    // Wrong order
+                    SoundManager.playError();
+                    btn.style.animation = 'shake 0.4s';
+                    addScore(false, btn);
+                    setTimeout(() => btn.style.animation = '', 400);
+
+                    // Visual Hint: Shake the correct slot?
+                    // const correctSlot = slotsContainer.children[currentExpectedIndex];
+                    // correctSlot.style.animation = 'shake 0.4s';
+                }
+            });
+
+            poolDiv.appendChild(btn);
+        });
+
+        container.appendChild(poolDiv);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Matrix (Bilsem IQ) ---
+
+    function setupMatrixGame(level) {
+        gameTitle.textContent = "Matris Bulmacası";
+        gameInstruction.textContent = "Soru işareti yerine hangisi gelmeli?";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Difficulty: 2x2 for Low Levels, 3x3 for High Levels (e.g., Lvl 4+)
+        const isHard = level >= 4;
+        const gridSize = isHard ? 3 : 2; // 3x3 or 2x2
+
+        let matrixType = 'color';
+        if (level >= 8) matrixType = 'progression';
+        else if (Math.random() > 0.5) matrixType = 'shape';
+
+        const container = document.createElement('div');
+        container.className = 'matrix-container';
+
+        const grid = document.createElement('div');
+        grid.className = 'matrix-grid';
+        if (isHard) grid.classList.add('grid-3x3');
+
+        let cells = [];
+        let answerItem;
+
+        // Use Pattern Elements (shapes/colors)
+        const shapes = PATTERN_ELEMENTS.shapes;
+
+        if (isHard) {
+            // 3x3 Logic
+            // Pattern: Shift / Permutation (Sudoku Style)
+            // A B C
+            // B C A
+            // C A ? -> Answer B
+
+            // Select 3 unique items
+            const pool = [...shapes].sort(() => 0.5 - Math.random());
+            const A = pool[0];
+            const B = pool[1];
+            const C = pool[2];
+
+            // Row 1
+            cells.push(A, B, C);
+            // Row 2
+            cells.push(B, C, A);
+            // Row 3
+            cells.push(C, A, B); // Last one is answer
+
+            // Remove last item to make it the answer
+            answerItem = B;
+            cells.pop(); // Remove the answer from the grid to replace with ?
+
+        } else {
+            // 2x2 Logic
+            if (matrixType === 'color') {
+                // Pattern Completion
+                // [A] [B]
+                // [A] [?] -> B
+                const shapeA = shapes[Math.floor(Math.random() * shapes.length)];
+                let shapeB = shapes[Math.floor(Math.random() * shapes.length)];
+                while (shapeA === shapeB) shapeB = shapes[Math.floor(Math.random() * shapes.length)];
+
+                cells = [shapeA, shapeB, shapeA];
+                answerItem = shapeB;
+            } else {
+                // Progression / Shape
+                // [A] [A]
+                // [B] [?] -> B
+                const shapeA = shapes[Math.floor(Math.random() * shapes.length)];
+                let shapeB = shapes[Math.floor(Math.random() * shapes.length)];
+                while (shapeA === shapeB) shapeB = shapes[Math.floor(Math.random() * shapes.length)];
+
+                cells = [shapeA, shapeA, shapeB];
+                answerItem = shapeB;
+            }
+        }
+
+        // Render Grid
+        cells.forEach(item => {
+            const cell = document.createElement('div');
+            cell.className = 'matrix-cell';
+            cell.textContent = item.emoji;
+            grid.appendChild(cell);
+        });
+
+        // Question Mark Cell
+        const qCell = document.createElement('div');
+        qCell.className = 'matrix-cell question';
+        qCell.textContent = '?';
+        grid.appendChild(qCell);
+
+        container.appendChild(grid);
+
+        // Options
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'matrix-options';
+
+        let choices = [answerItem];
+        // Distractors
+        while (choices.length < 3) {
+            const random = shapes[Math.floor(Math.random() * shapes.length)];
+            if (!choices.some(c => c.name === random.name)) choices.push(random);
+        }
+        choices.sort(() => 0.5 - Math.random());
+
+        choices.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'matrix-option-btn';
+            btn.textContent = opt.emoji;
+
+            btn.addEventListener('click', () => {
+                if (opt.name === answerItem.name) {
+                    SoundManager.playMatch();
+                    qCell.textContent = opt.emoji;
+                    qCell.classList.remove('question');
+                    qCell.style.color = 'black';
+                    qCell.style.background = '#d4edda';
+
+                    btn.style.background = '#d4edda';
+                    addScore(true, btn);
+                    setTimeout(advanceQueue, 800);
+                } else {
+                    SoundManager.playError();
+                    btn.style.animation = 'shake 0.4s';
+                    btn.style.background = '#f8d7da';
+                    addScore(false, btn);
+                    setTimeout(() => {
+                        btn.style.animation = '';
+                        btn.style.background = 'white';
+                    }, 400);
+                }
+            });
+            optionsDiv.appendChild(btn);
+        });
+
+        container.appendChild(optionsDiv);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Reflection / Mirror ---
+
+    function setupMirrorGame(level) {
+        gameTitle.textContent = "Ayna Ayna";
+        gameInstruction.textContent = "Resmin aynadaki yansıması hangisidir?";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Pick asymmetric target
+        // Animals usually face one way or are symmetric. 
+        // Best: Cars, Fish, asymmetric fruits/veggies
+        const candidates = [
+            ...THEMES.animals,
+            ...ASSOCIATION_PAIRS.map(p => p.a),
+            ...ASSOCIATION_PAIRS.map(p => p.b)
+        ];
+
+        const targetItem = candidates[Math.floor(Math.random() * candidates.length)];
+
+        const container = document.createElement('div');
+        container.className = 'mirror-container';
+
+        // Scene: Target | Mirror | Placeholder
+        const scene = document.createElement('div');
+        scene.className = 'mirror-scene';
+
+        // 1. Target
+        const targetDiv = document.createElement('div');
+        targetDiv.className = 'mirror-target';
+        const img = document.createElement('img');
+        img.src = targetItem.src;
+        // Ensure starting orientation is standard
+        targetDiv.appendChild(img);
+        scene.appendChild(targetDiv);
+
+        // 2. Mirror Line
+        const line = document.createElement('div');
+        line.className = 'mirror-line';
+        scene.appendChild(line);
+
+        // 3. Placeholder
+        const placeholder = document.createElement('div');
+        placeholder.className = 'mirror-reflection-placeholder';
+        placeholder.textContent = '?';
+        scene.appendChild(placeholder);
+
+        container.appendChild(scene);
+
+        // Options
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mirror-options';
+
+        // Generate transformations
+        // Correct: ScaleX(-1)
+        // Distractors: None, ScaleY(-1), Rotate
+
+        const transforms = [
+            { id: 'correct', class: 'transform-flip-x' },
+            { id: 'normal', class: '' },
+            { id: 'flip-y', class: 'transform-flip-y' }
+        ];
+
+        // Add 4th distractor for higher level
+        if (level >= 5) {
+            transforms.push({ id: 'rotate', class: 'transform-rotate-180' });
+        }
+
+        transforms.sort(() => 0.5 - Math.random());
+
+        transforms.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = 'mirror-option-btn';
+
+            const optImg = document.createElement('img');
+            optImg.src = targetItem.src;
+            if (t.class) optImg.className = t.class;
+
+            btn.appendChild(optImg);
+
+            btn.addEventListener('click', () => {
+                if (t.id === 'correct') {
+                    // Win
+                    SoundManager.playMatch();
+
+                    placeholder.textContent = '';
+                    const correctImg = document.createElement('img');
+                    correctImg.src = targetItem.src;
+                    correctImg.className = 'transform-flip-x';
+                    correctImg.style.width = '100%';
+                    correctImg.style.height = '100%';
+                    correctImg.style.objectFit = 'contain';
+                    placeholder.appendChild(correctImg);
+                    placeholder.style.border = '3px solid #4CAF50';
+                    placeholder.style.background = 'white';
+
+                    addScore(true, btn);
+                    setTimeout(advanceQueue, 1000);
+                } else {
+                    // Lose
+                    SoundManager.playError();
+                    btn.style.animation = 'shake 0.4s';
+                    btn.style.background = '#f8d7da';
+                    addScore(false, btn);
+                    setTimeout(() => {
+                        btn.style.animation = '';
+                        btn.style.background = 'white';
+                    }, 400);
+                }
+            });
+
+            optionsDiv.appendChild(btn);
+        });
+
+        container.appendChild(optionsDiv);
+        gameBoard.appendChild(container);
+
+    }
+
+    // --- Game Logic: Puzzle (Part-Whole) ---
+
+    function setupPuzzleGame(level) {
+        gameTitle.textContent = "Parça Bütün";
+        gameInstruction.textContent = "Bu parça hangi resme ait?";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Pick distinct objects
+        let pool = [...THEMES.animals, ...THEMES.fruits, ...THEMES.vehicles];
+        pool = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const correctItem = pool[0];
+
+        // Container
+        const container = document.createElement('div');
+        container.className = 'puzzle-container';
+
+        // Question Zoom Frame
+        const frame = document.createElement('div');
+        frame.className = 'puzzle-question-frame';
+
+        const zoomImg = document.createElement('img');
+        zoomImg.src = correctItem.src;
+        zoomImg.className = 'puzzle-image-zoomed';
+
+        // Random Zoom Position (Transform Origin)
+        // Values between 20% and 80% to avoid showing empty edge
+        const x = 20 + Math.floor(Math.random() * 60);
+        const y = 20 + Math.floor(Math.random() * 60);
+        zoomImg.style.transformOrigin = `${x}% ${y}%`;
+
+        frame.appendChild(zoomImg);
+        container.appendChild(frame);
+
+        // Options
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'puzzle-options';
+
+        pool.sort(() => 0.5 - Math.random()); // Shuffle options
+
+        pool.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'puzzle-option-btn';
+
+            const img = document.createElement('img');
+            img.src = opt.src;
+            btn.appendChild(img);
+
+            btn.addEventListener('click', () => {
+                if (opt.name === correctItem.name) {
+                    SoundManager.playMatch();
+                    // Reveal: Zoom out animation
+                    zoomImg.style.transition = 'transform 1s, transform-origin 1s';
+                    zoomImg.style.transform = 'scale(1)';
+                    zoomImg.style.transformOrigin = 'center center';
+
+                    frame.style.border = '8px solid #4CAF50';
+                    btn.style.border = '4px solid #4CAF50';
+
+                    addScore(true, btn);
+                    setTimeout(advanceQueue, 1500);
+                } else {
+                    SoundManager.playError();
+                    btn.style.animation = 'shake 0.4s';
+                    btn.style.borderColor = '#f44336';
+                    addScore(false, btn);
+                    setTimeout(() => {
+                        btn.style.animation = '';
+                        btn.style.borderColor = 'white';
+                    }, 400);
+                }
+            });
+            optionsDiv.appendChild(btn);
+        });
+
+        container.appendChild(optionsDiv);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Coding Path ---
+
+    function setupCodingGame(level) {
+        gameTitle.textContent = "Kodlama Zamanı";
+        gameInstruction.textContent = "Tavşanı havuca götüren yolu kodla!";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        const container = document.createElement('div');
+        container.className = 'coding-container';
+
+        // Difficulty Settings
+        let gridSize = 3;
+        if (level >= 8) gridSize = 5;
+        else if (level >= 4) gridSize = 4;
+
+        const obstacleCount = Math.max(0, gridSize - 2); // 3x3=1, 4x4=2, 5x5=3 rocks approx
+
+        // Grid
+        const grid = document.createElement('div');
+        grid.className = 'coding-grid';
+        if (gridSize === 4) grid.classList.add('grid-4x4');
+        if (gridSize === 5) grid.classList.add('grid-5x5');
+
+        // Logic: Random Positions
+        // Goal shouldn't be too close to start
+
+        let playerPos, goalPos;
+        let valid = false;
+
+        while (!valid) {
+            playerPos = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+            goalPos = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+
+            // Distance Requirement: Manhattan dist > 1 (at least 2 steps)
+            const dist = Math.abs(playerPos.x - goalPos.x) + Math.abs(playerPos.y - goalPos.y);
+            if (dist > 1 && (playerPos.x !== goalPos.x || playerPos.y !== goalPos.y)) {
+                valid = true;
+            }
+        }
+
+        let obstacles = [];
+        // Generate obstacles
+        for (let i = 0; i < obstacleCount; i++) {
+            let rock;
+            let attempts = 0;
+            do {
+                rock = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+                attempts++;
+            } while (
+                attempts < 20 &&
+                (
+                    (rock.x === playerPos.x && rock.y === playerPos.y) ||
+                    (rock.x === goalPos.x && rock.y === goalPos.y) ||
+                    obstacles.some(o => o.x === rock.x && o.y === rock.y)
+                )
+            );
+            // Ensure path exists (Simple check: Just don't block immediate neighbors of Start/End if possible, 
+            // but true pathfinding is complex. For kids game simple random usually works unless very unlucky.
+            // With few obstacles, blocking is rare. 
+            if (attempts < 20) obstacles.push(rock);
+        }
+
+        // Render Grid
+        const cells = [];
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'coding-cell';
+                cell.dataset.x = x;
+                cell.dataset.y = y;
+
+                if (x === playerPos.x && y === playerPos.y) cell.classList.add('start');
+                if (x === goalPos.x && y === goalPos.y) cell.textContent = '🥕';
+                if (obstacles.some(o => o.x === x && o.y === y)) {
+                    cell.classList.add('wall');
+                    cell.textContent = '🪨';
+                }
+
+                grid.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        // Player (Rabbit)
+        const player = document.createElement('div');
+        player.textContent = '🐇';
+        player.className = 'coding-player';
+
+        const startCellIndex = playerPos.y * gridSize + playerPos.x;
+        cells[startCellIndex].appendChild(player);
+
+        container.appendChild(grid);
+
+        // UI
+        const ui = document.createElement('div');
+        ui.className = 'coding-ui';
+
+        // Command Bar
+        const cmdBar = document.createElement('div');
+        cmdBar.className = 'coding-command-bar';
+        ui.appendChild(cmdBar);
+
+        // Controls
+        const controls = document.createElement('div');
+        controls.className = 'coding-controls';
+
+        const moves = [];
+
+        const addMove = (dir, symbol) => {
+            if (moves.length >= (gridSize * 2 + 2)) return; // Allow more moves for larger grid
+            moves.push(dir);
+            const icon = document.createElement('div');
+            icon.className = 'command-icon';
+            icon.textContent = symbol;
+            cmdBar.appendChild(icon);
+            SoundManager.playClick();
+        };
+
+        const btns = [
+            { dir: 'up', sym: '⬆️', row: 1, col: 2 },
+            { dir: 'left', sym: '⬅️', row: 2, col: 1 },
+            { dir: 'down', sym: '⬇️', row: 2, col: 2 },
+            { dir: 'right', sym: '➡️', row: 2, col: 3 }
+        ];
+
+        btns.forEach(b => {
+            const btn = document.createElement('button');
+            btn.className = 'code-btn';
+            btn.textContent = b.sym;
+            btn.style.gridRow = b.row;
+            btn.style.gridColumn = b.col;
+            btn.addEventListener('click', () => addMove(b.dir, b.sym));
+            controls.appendChild(btn);
+        });
+
+        // Run Button
+        const runBtn = document.createElement('button');
+        runBtn.className = 'code-btn code-run-btn';
+        runBtn.textContent = 'Çalıştır ▶';
+        runBtn.addEventListener('click', async () => {
+            if (moves.length === 0) return;
+            // Disable buttons
+            Array.from(controls.children).forEach(b => b.disabled = true);
+
+            // Execute
+            let currentP = { ...playerPos };
+            let fail = false;
+
+            for (let move of moves) {
+                // Wait a bit
+                await new Promise(r => setTimeout(r, 500));
+
+                let next = { ...currentP };
+                if (move === 'up') next.y--;
+                if (move === 'down') next.y++;
+                if (move === 'left') next.x--;
+                if (move === 'right') next.x++;
+
+                // Check Bounds
+                if (next.x < 0 || next.x >= gridSize || next.y < 0 || next.y >= gridSize) {
+                    fail = true;
+                    // Wall hit feedback
+                } else if (obstacles.some(o => o.x === next.x && o.y === next.y)) {
+                    fail = true;
+                }
+
+                if (!fail) {
+                    currentP = next;
+                    // Move visual
+                    const cellIndex = currentP.y * gridSize + currentP.x;
+                    cells[cellIndex].appendChild(player);
+                    cells[cellIndex].classList.add('path-active');
+                    SoundManager.playClick();
+                } else {
+                    // Animation crash
+                    player.textContent = '💥';
+                    SoundManager.playError();
+                    break;
+                }
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+
+            // Check Win
+            if (!fail && currentP.x === goalPos.x && currentP.y === goalPos.y) {
+                SoundManager.playMatch();
+                addScore(true, runBtn);
+                setTimeout(advanceQueue, 1000);
+            } else {
+                if (!fail) SoundManager.playError(); // Reached somewhere else
+                addScore(false, runBtn);
+                setTimeout(() => {
+                    // Reset with SAME layout so they can retry? Or new one?
+                    // Usually retry same level layout is better for learning but here we regen.
+                    // Let's Regen for variety.
+                    setupCodingGame(level);
+                }, 1000);
+            }
+        });
+
+        // Clear Btn (Optional, but let's put Run in grid logic so we might skip clear for simplicity or replace run text)
+        // Let's rely on restart if fail.
+
+        controls.appendChild(runBtn);
+        ui.appendChild(controls);
+        container.appendChild(ui);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Mental Rotation (Transformation Style) ---
+
+    function setupRotationGame(level) {
+        gameTitle.textContent = "Şekli Döndür!";
+        gameInstruction.textContent = "Komutları kullanarak şekli Hedef'teki gibi yap.";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        // Pick item
+        const item = THEMES.vehicles[Math.floor(Math.random() * THEMES.vehicles.length)];
+
+        // Setup DOM
+        const container = document.createElement('div');
+        container.className = 'rotation-container';
+
+        // Scene: Source vs Target
+        const scene = document.createElement('div');
+        scene.className = 'rotation-scene';
+
+        // Source (Player)
+        const sourceBox = document.createElement('div');
+        sourceBox.className = 'rotation-box';
+        sourceBox.innerHTML = '<span class="rotation-label">Senin Şeklin</span>';
+        const sourceFrame = document.createElement('div');
+        sourceFrame.className = 'rotation-frame';
+        const sourceImg = document.createElement('img');
+        sourceImg.src = item.src;
+        sourceImg.className = 'rotation-img';
+        sourceFrame.appendChild(sourceImg);
+        sourceBox.appendChild(sourceFrame);
+
+        // Target (Goal)
+        const targetBox = document.createElement('div');
+        targetBox.className = 'rotation-box';
+        targetBox.innerHTML = '<span class="rotation-label">Hedef</span>';
+        const targetFrame = document.createElement('div');
+        targetFrame.className = 'rotation-frame target';
+        const targetImg = document.createElement('img');
+        targetImg.src = item.src;
+        targetImg.className = 'rotation-img';
+        targetFrame.appendChild(targetImg);
+        targetBox.appendChild(targetFrame);
+
+        scene.appendChild(sourceBox);
+        scene.appendChild(targetBox);
+        container.appendChild(scene);
+
+        // Generate Target State
+        // Level 1-3: Simple 90 deg OR simple flip
+        // Level 4+: Random steps (2-3 steps)
+
+        let targetState = { rot: 0, scaleX: 1, scaleY: 1 };
+
+        // Random transformations to apply
+        const possibleMoves = ['right', 'left', 'down', 'up'];
+        let steps = 1;
+        if (level >= 4) steps = 2;
+        if (level >= 8) steps = 3;
+
+        for (let i = 0; i < steps; i++) {
+            const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            if (move === 'right') targetState.rot += 90;
+            if (move === 'left') targetState.rot -= 90;
+            if (move === 'down') targetState.scaleY *= -1; // Vertical Flip
+            if (move === 'up') targetState.scaleX *= -1;   // Horizontal Flip
+        }
+
+        // Apply to Target
+        targetImg.style.transform = `rotate(${targetState.rot}deg) scale(${targetState.scaleX}, ${targetState.scaleY})`;
+
+        // UI for Controls
+        const ui = document.createElement('div');
+        ui.className = 'coding-ui';
+
+        // Command Bar
+        const cmdBar = document.createElement('div');
+        cmdBar.className = 'coding-command-bar';
+        ui.appendChild(cmdBar);
+
+        // Controls
+        const controls = document.createElement('div');
+        controls.className = 'rotation-controls';
+
+        const moves = [];
+
+        const addMove = (type, symbol) => {
+            if (moves.length >= 6) return;
+            moves.push(type);
+            const icon = document.createElement('div');
+            icon.className = 'command-icon';
+            icon.textContent = symbol;
+            cmdBar.appendChild(icon);
+            SoundManager.playClick();
+        };
+
+        // Layout: Up (Flip X), Down (Flip Y), Left (Rot -90), Right (Rot +90)
+        // User asked: "Sağa/Sola döndür" (Rot), "Aşağı/Yukarı döndür" (We map to Flips)
+        // Up Arrow -> Flip Horizontal (Mirror Left/Right)
+        // Down Arrow -> Flip Vertical (Mirror Up/Down)
+
+        const btns = [
+            { id: 'up', sym: '⬆️', row: 1, col: 2 }, // Flip Horizontal
+            { id: 'left', sym: '⬅️', row: 2, col: 1 }, // Rot -90
+            { id: 'down', sym: '⬇️', row: 2, col: 2 }, // Flip Vertical
+            { id: 'right', sym: '➡️', row: 2, col: 3 }  // Rot +90
+        ];
+
+        btns.forEach(b => {
+            const btn = document.createElement('button');
+            btn.className = 'code-btn';
+            btn.textContent = b.sym;
+            btn.style.gridRow = b.row;
+            btn.style.gridColumn = b.col;
+
+            btn.addEventListener('click', () => {
+                let type = '';
+                if (b.id === 'right') type = 'rot+';
+                if (b.id === 'left') type = 'rot-';
+                if (b.id === 'up') type = 'flipH';
+                if (b.id === 'down') type = 'flipV';
+                addMove(type, b.sym);
+            });
+            controls.appendChild(btn);
+        });
+
+        // Run Button
+        const runBtn = document.createElement('button');
+        runBtn.className = 'code-btn code-run-btn';
+        runBtn.textContent = 'Çalıştır ▶';
+        runBtn.addEventListener('click', async () => {
+            if (moves.length === 0) return;
+            // Disable buttons
+            Array.from(controls.children).forEach(b => b.disabled = true);
+
+            // Execute
+            let currentState = { rot: 0, scaleX: 1, scaleY: 1 };
+
+            for (let move of moves) {
+                await new Promise(r => setTimeout(r, 600)); // Wait for animation
+
+                if (move === 'rot+') currentState.rot += 90;
+                if (move === 'rot-') currentState.rot -= 90;
+                if (move === 'flipH') currentState.scaleX *= -1; // Up button
+                if (move === 'flipV') currentState.scaleY *= -1; // Down button
+
+                // Apply
+                sourceImg.style.transform = `rotate(${currentState.rot}deg) scale(${currentState.scaleX}, ${currentState.scaleY})`;
+                SoundManager.playClick();
+            }
+
+            await new Promise(r => setTimeout(r, 600));
+
+            // Verify
+            // Compare Computed Matrix or simplified properties
+            // Issue: rotate(180) vs scale(-1, -1). 
+            // Let's use getComputedStyle matrix checks.
+
+            const targetMatrix = window.getComputedStyle(targetImg).transform;
+            const sourceMatrix = window.getComputedStyle(sourceImg).transform;
+
+            // Matrices are "matrix(a, b, c, d, tx, ty)"
+            // Tolerant check or exact string?
+            // If the visuals are identical, the matrix usually is too, unless 360 rotation difference.
+            // But 360 deg rotation results in same matrix? Yes.
+
+            if (targetMatrix === sourceMatrix) {
+                SoundManager.playMatch();
+                sourceFrame.style.borderColor = '#4CAF50';
+                sourceFrame.style.background = '#d4edda';
+                addScore(true, runBtn);
+                setTimeout(advanceQueue, 1500);
+            } else {
+                SoundManager.playError();
+                // Feedback
+                sourceFrame.style.borderColor = '#f44336';
+                sourceFrame.style.animation = 'shake 0.4s';
+                addScore(false, runBtn);
+                setTimeout(() => {
+                    // Retry same one
+                    setupRotationGame(level);
+                }, 1000);
+            }
+        });
+
+        controls.appendChild(runBtn);
+        ui.appendChild(controls);
+        container.appendChild(ui);
+        gameBoard.appendChild(container);
+    }
+
+    // --- Game Logic: Cube Counting (Bilsem) ---
+
+    function setupCubeGame(level) {
+        gameTitle.textContent = "Küp Sayma";
+        gameInstruction.textContent = "Toplam kaç küp var? (Görünmeyenleri unutma!)";
+        gameBoard.innerHTML = '';
+        gameBoard.className = '';
+
+        const container = document.createElement('div');
+        container.className = 'cube-container';
+
+        const scene = document.createElement('div');
+        scene.className = 'cube-scene';
+        container.appendChild(scene);
+
+        // Generate Map
+        // 3x3 Grid
+        // Heights: 0 to 3
+        let grid = [];
+        let totalCubes = 0;
+
+        // Difficulty scaling
+        const size = 3;
+        const maxH = level >= 5 ? 4 : 3;
+        const minBlocks = level >= 3 ? 5 : 3;
+
+        // Generate valid map
+        while (true) {
+            grid = [];
+            totalCubes = 0;
+            for (let x = 0; x < size; x++) {
+                grid[x] = [];
+                for (let y = 0; y < size; y++) {
+                    let h = Math.floor(Math.random() * (maxH + 1));
+                    grid[x][y] = h;
+                    totalCubes += h;
+                }
+            }
+            // Check constraints
+            // Must have connectivity? Or just simple pile?
+            // Simple random pile is fine for now, but let's ensure > minBlocks
+            if (totalCubes >= minBlocks && totalCubes <= 15) break;
+        }
+
+        // Render Cubes
+        // Isometric Projection:
+        // x goes Right-down
+        // y goes Left-down
+        // z goes Up
+
+        const width = 40; // from CSS
+        const height = 40;
+
+        // Sort order for painter's algorithm: Back-to-Front
+        // Farthest is (x=0, y=0)? 
+        // Screen X = (x - y) ...
+        // We need to draw "back" first.
+        // Back-Left corner (0,0) is furthest?
+        // Actually, Painter sort for isometric:
+        // sort by (x + y + z) usually works for simple cubes.
+
+        let blocks = [];
+        for (let x = 0; x < size; x++) {
+            for (let y = 0; y < size; y++) {
+                let h = grid[x][y];
+                for (let z = 0; z < h; z++) {
+                    blocks.push({ x, y, z });
+                }
+            }
+        }
+
+        // Sort: primary by (x+y), secondary by z
+        blocks.sort((a, b) => {
+            return (a.x + a.y + a.z) - (b.x + b.y + b.z);
+        });
+
+        blocks.forEach(b => {
+            const cube = document.createElement('div');
+            cube.className = 'iso-cube';
+
+            // Top Face
+            const top = document.createElement('div');
+            top.className = 'iso-face-top';
+            cube.appendChild(top);
+
+            // Left Face
+            const left = document.createElement('div');
+            left.className = 'iso-face-left';
+            cube.appendChild(left);
+
+            // Right Face
+            const right = document.createElement('div');
+            right.className = 'iso-face-right';
+            cube.appendChild(right);
+
+            // Position
+            // Iso transform:
+            // ScreenX = (x - y) * tile_width_half
+            // ScreenY = (x + y) * tile_height_half - (z * height)
+
+            // Our CSS widths are 40px.
+            const dw = 22; // Half width overlap roughly
+            const dh = 12; // Half height overlap roughly
+
+            const screenX = (b.x - b.y) * 35; // Spread horizontal
+            const screenY = (b.x + b.y) * 20 - (b.z * 40); // Spread vertical
+
+            cube.style.transform = `translate(${screenX}px, ${screenY}px)`;
+
+            // z-index explicit to be safe
+            cube.style.zIndex = (b.x + b.y + b.z);
+
+            scene.appendChild(cube);
+        });
+
+        // Options
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'cube-options';
+
+        // Generate options
+        let opts = new Set();
+        opts.add(totalCubes);
+        while (opts.size < 3) {
+            let offset = Math.floor(Math.random() * 5) - 2; // -2 to +2
+            let val = totalCubes + offset;
+            if (val > 0 && val !== totalCubes) opts.add(val);
+        }
+
+        Array.from(opts).sort((a, b) => a - b).forEach(val => {
+            const btn = document.createElement('button');
+            btn.className = 'cube-opt-btn';
+            btn.textContent = val;
+            btn.addEventListener('click', () => {
+                if (val === totalCubes) {
+                    SoundManager.playMatch();
+                    btn.style.borderColor = '#4CAF50';
+                    btn.style.background = '#e8f5e9';
+                    addScore(true, btn);
+                    setTimeout(advanceQueue, 1500);
+                } else {
+                    SoundManager.playError();
+                    btn.style.borderColor = '#f44336';
+                    btn.style.animation = 'shake 0.4s';
+                    addScore(false, btn);
+                    setTimeout(() => btn.style.borderColor = '#eee', 500);
+                }
+            });
+            optionsDiv.appendChild(btn);
+        });
+
+        gameBoard.appendChild(container);
+        gameBoard.appendChild(optionsDiv);
     }
 
     // --- Helpers ---

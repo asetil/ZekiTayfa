@@ -1155,3 +1155,834 @@ h2 {
         padding: 15px;
     }
 }
+
+/* --- Shadow Game Styles --- */
+.shadow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.shadow-target {
+    width: 150px;
+    height: 150px;
+    background-color: white;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    animation: float 3s ease-in-out infinite;
+}
+
+.shadow-target img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.shadow-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.shadow-btn {
+    width: 120px;
+    height: 120px;
+    border: none;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shadow-btn:hover {
+    transform: scale(1.05);
+    background: white;
+}
+
+/* This filter turns any transparent PNG into a solid black silhouette */
+.shadow-icon {
+    filter: brightness(0) opacity(0.8);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: filter 0.3s;
+}
+
+/* Reveal shape on correct guess */
+.shadow-btn.revealed .shadow-icon {
+    filter: none;
+}
+
+/* --- Sorting Game Styles --- */
+.sorting-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.sorting-slots-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-end;
+    /* Align bottom so they look like steps */
+    min-height: 200px;
+    width: 100%;
+}
+
+.sorting-slot {
+    width: 100px;
+    height: 100px;
+    /* Base size */
+    background: rgba(255, 255, 255, 0.3);
+    border: 3px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    position: relative;
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.sorting-slot.filled {
+    border-style: solid;
+    background: white;
+    border-color: #4CAF50;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sorting-slot.filled::after {
+    content: '';
+    /* Remove the placeholder icon/text */
+}
+
+/* Sizes for slots */
+.slot-small {
+    width: 80px;
+    height: 80px;
+}
+
+.slot-medium {
+    width: 110px;
+    height: 110px;
+}
+
+.slot-large {
+    width: 140px;
+    height: 140px;
+}
+
+.slot-xlarge {
+    width: 170px;
+    height: 170px;
+}
+
+/* The pool of items to sort */
+.sorting-pool {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+    min-width: 300px;
+    min-height: 100px;
+}
+
+.sort-item-btn {
+    background: white;
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sort-item-btn:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.sort-item-btn.selected {
+    opacity: 0.2;
+    pointer-events: none;
+    transform: scale(0.8);
+    filter: grayscale(1);
+}
+
+.sort-item-img {
+    object-fit: contain;
+    width: 80%;
+    height: 80%;
+}
+
+/* Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* --- Matrix Logic Game Styles --- */
+.matrix-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background: #444;
+    padding: 15px;
+    border-radius: 20px;
+    width: 200px;
+    height: 200px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.matrix-grid.grid-3x3 {
+    grid-template-columns: repeat(3, 1fr);
+    width: 300px;
+    height: 300px;
+}
+
+.matrix-cell {
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.matrix-grid.grid-3x3 .matrix-cell {
+    font-size: 2.5rem;
+}
+
+.matrix-cell.question {
+    background: #FFD700;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #a85d00;
+    animation: pulse 1.5s infinite;
+}
+
+.matrix-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.matrix-option-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    border: none;
+    background: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.matrix-option-btn:hover {
+    transform: translateY(-5px);
+}
+
+/* --- Mirror Game Styles --- */
+.mirror-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+}
+
+.mirror-scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    /* No gap, connected by mirror line */
+    background: rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 30px;
+    position: relative;
+}
+
+.mirror-target {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mirror-target img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.mirror-line {
+    width: 4px;
+    height: 180px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+    border-left: 2px dashed rgba(255, 255, 255, 0.5);
+    margin: 0 40px;
+    position: relative;
+}
+
+.mirror-line::after {
+    content: 'AYNA';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    background: #2C3E50;
+    color: white;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    letter-spacing: 2px;
+}
+
+.mirror-reflection-placeholder {
+    width: 150px;
+    height: 150px;
+    border: 3px dashed rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.mirror-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.mirror-option-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    padding: 10px;
+}
+
+.mirror-option-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.mirror-option-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Transformations */
+.transform-flip-x {
+    transform: scaleX(-1);
+}
+
+.transform-flip-y {
+    transform: scaleY(-1);
+}
+
+.transform-rotate-90 {
+    transform: rotate(90deg);
+}
+
+.transform-rotate-180 {
+    transform: rotate(180deg);
+}
+
+.transform-rotate-270 {
+    transform: rotate(270deg);
+}
+
+/* --- Puzzle Game (Part-Whole) Styles --- */
+.puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.puzzle-question-frame {
+    width: 200px;
+    height: 200px;
+    border: 8px solid #333;
+    border-radius: 50%;
+    /* Magnifying glass look */
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    background: #f0f0f0;
+}
+
+.puzzle-question-frame::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 60px;
+    height: 20px;
+    background: #333;
+    transform: rotate(45deg);
+    /* Handle of magnifying glass - rough approximations */
+    display: none;
+    /* Removed for cleaner look */
+}
+
+.puzzle-image-zoomed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(2.5);
+    /* Zoom in! */
+    transform-origin: center center;
+}
+
+.puzzle-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.puzzle-option-btn {
+    width: 100px;
+    height: 100px;
+    border: 4px solid white;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.puzzle-option-btn:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    border-color: var(--secondary-color);
+}
+
+.puzzle-option-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: white;
+}
+
+/* --- Coding Game Styles --- */
+.coding-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.coding-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3x3 Default */
+    gap: 5px;
+    background: #5D4037;
+    /* Soil/Ground color */
+    padding: 10px;
+    border-radius: 15px;
+    width: 280px;
+    height: 280px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.coding-grid.grid-4x4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.coding-grid.grid-5x5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.coding-cell {
+    background: #8D6E63;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    position: relative;
+}
+
+.coding-grid.grid-4x4 .coding-cell {
+    font-size: 1.8rem;
+}
+
+.coding-grid.grid-5x5 .coding-cell {
+    font-size: 1.5rem;
+}
+
+.coding-cell.start {
+    background: #AED581;
+    /* Grassy start */
+}
+
+.coding-cell.end {
+    background: #FFCC80;
+    /* Goal area */
+}
+
+.coding-cell.wall {
+    background: #4E342E;
+    /* Dark rock */
+}
+
+.coding-cell.path-active {
+    background: #FFF176;
+    /* Highlight path */
+    transition: background 0.3s;
+}
+
+.coding-player {
+    font-size: 2.5rem;
+    position: absolute;
+    transition: all 0.5s ease-in-out;
+    z-index: 10;
+}
+
+.coding-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.coding-command-bar {
+    display: flex;
+    gap: 5px;
+    height: 50px;
+    background: white;
+    padding: 5px;
+    border-radius: 10px;
+    width: 100%;
+    overflow-x: auto;
+    align-items: center;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.command-icon {
+    font-size: 1.5rem;
+    background: #e0e0e0;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+.coding-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(2, 50px);
+    gap: 10px;
+    justify-items: center;
+    align-items: center;
+}
+
+.code-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    background: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.code-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.code-run-btn {
+    grid-column: 1 /span 3;
+    width: 100%;
+    background: #4CAF50;
+    /* Restore background */
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* --- Rotation Game Styles (Transformation Coding) --- */
+.rotation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.rotation-scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    /* Subtle backing */
+    border-radius: 20px;
+}
+
+.rotation-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.rotation-frame {
+    width: 150px;
+    height: 150px;
+    border: 5px solid #555;
+    border-radius: 20px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    overflow: hidden;
+    /* Keep image inside */
+}
+
+/* Specific style for Target Frame to stand out */
+.rotation-frame.target {
+    border-color: #2196F3;
+    /* Blue target */
+    border-style: dashed;
+    background: #e3f2fd;
+}
+
+.rotation-img {
+    width: 70%;
+    /* Smaller to allow room for rotation not clipping corners */
+    height: 70%;
+    object-fit: contain;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy rotation */
+}
+
+.rotation-label {
+    font-weight: 800;
+    color: #444;
+    font-size: 1.3rem;
+    background: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rotation-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 70px);
+    grid-template-rows: repeat(2, 60px);
+    gap: 12px;
+    justify-items: center;
+    align-items: center;
+    background: #eee;
+    padding: 15px;
+    border-radius: 20px;
+    border: 4px solid #ddd;
+}
+
+/* Ensure buttons are big enough */
+.rotation-controls .code-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+}
+
+/* Fix Run button in rotation controls to be wide and proper height */
+.rotation-controls .code-run-btn {
+    width: 100%;
+    height: 50px;
+    font-size: 1.2rem;
+}
+
+/* --- Cube Counting Game Styles (Isometric) --- */
+.cube-container {
+    position: relative;
+    width: 320px;
+    height: 300px;
+    margin: 20px auto;
+    /* Center the isometric scene */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cube-scene {
+    position: relative;
+    width: 0;
+    height: 0;
+    /* The cubes are absolutely positioned from this center point */
+    top: 50px;
+    /* Slight offset down */
+}
+
+/* Individual Cube */
+.cube {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    /* Standard CSS Isometric trick */
+}
+
+/* Faces */
+.cube-face {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cube-top {
+    background: #FFEB3B;
+    transform: rotate(45deg) skew(15deg, 15deg) translate(0, 0);
+    /* Simple isometric top */
+    background: linear-gradient(135deg, #FFF176, #FDD835);
+    /* Adjusted transform for true isometric projection look */
+    transform: rotate(45deg) skew(-15deg, -15deg) scaleY(0.8);
+    /* Actually let's use a simpler known composition for perfect alignment */
+}
+
+/* REVISED Simple Composition Strategy */
+.iso-cube {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+}
+
+.iso-face-top {
+    position: absolute;
+    top: -28px;
+    /* Moves it up */
+    left: 0;
+    width: 40px;
+    height: 40px;
+    background: #4FC3F7;
+    /* Light Blue Top */
+    transform: rotate(45deg) skew(-15deg, -15deg);
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    /* Stronger border */
+    z-index: 2;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
+    /* Highland highlight */
+}
+
+.iso-face-left {
+    position: absolute;
+    top: 0;
+    left: -20px;
+    /* Shift left */
+    width: 40px;
+    height: 40px;
+    background: #0288D1;
+    /* Medium Blue Side */
+    transform: skewY(30deg);
+    border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.iso-face-right {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background: #01579B;
+    /* Dark Blue Shade */
+    transform: skewY(-30deg);
+    border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.cube-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cube-opt-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #eee;
+    background: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #ccc;
+    color: #333;
+}
+
+.cube-opt-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
